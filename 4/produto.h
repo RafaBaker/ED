@@ -14,4 +14,6 @@ void desalocaProduto(Produto* p);
 
 void imprimeProduto(Produto* p);
 
+int retornaCodigo(Produto* p);
+
 #endif

@@ -9,6 +9,9 @@ Lista* inicializaLista();
 
 void insereLista(Lista* lista, Produto* p);
 
+/**
+ * Essa função desaloca os itens que foram retirados da memória
+ */
 void retiraLista(Lista* lista, int codigo);
 
 void imprimeLista(Lista* lista);
