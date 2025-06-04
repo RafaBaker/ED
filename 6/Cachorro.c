@@ -1,4 +1,4 @@
-#include "cachorro.h"
+#include "Cachorro.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,6 +23,21 @@ Cachorro* inicCachorro(char* nome, int agressividade)
 void imprimeCachorro(Cachorro* cachorro)
 {
     printf("Cachorro: %s\nAgressividade: %d\n", cachorro->nome, cachorro->agressividade);
+}
+
+int getAgressividadeCachorro(Cachorro* cachorro)
+{
+    return cachorro->agressividade;
+}
+
+char* getNomeCachorro(Cachorro* cachorro)
+{
+    return cachorro->nome;
+}
+
+void atualizaAgressividade(Cachorro* cachorro)
+{
+    cachorro->agressividade = (cachorro->agressividade++) % 2;
 }
 
 void desalocaCachorro(Cachorro* cachorro)

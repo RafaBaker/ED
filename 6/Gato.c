@@ -1,4 +1,4 @@
-#include "gato.h"
+#include "Gato.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
