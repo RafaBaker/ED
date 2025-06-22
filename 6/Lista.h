@@ -8,17 +8,29 @@ enum Agressividade{
     BRAVO,
 };
 
-enum Tipo{
+typedef enum{
     CACHORRO,
     GATO
-};
+} Tipo;
 
 typedef struct Lista Lista;
 
 Lista* inicializaLista();
 
-void insereListaCachorro(Lista* lista, void* item);
+void insereLista(Lista* lista, void* item, Tipo tipo);
 
-void insereListaGato(Lista* lista, void* item);
+Celula* buscaLista(Lista* lista, char* nome);
+
+void retiraLista(Lista* lista, char* nome);
+
+// void insereListaCachorro(Lista* lista, void* item);
+// void insereListaGato(Lista* lista, void* item);
+
+void imprimeLista(Lista *lista);
+
+void liberaLista(Lista* lista);
+
+typedef void (*IteradorLista)(void *item, int tipo, void *dadoExtra);
+void paraCadaItem(Lista *lista, IteradorLista iterador, void *dadoExtra);
 
 #endif

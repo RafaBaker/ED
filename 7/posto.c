@@ -96,11 +96,11 @@ void realizaColeta(Posto* posto, char* pessoa, int idade)
  */
 void processaLoteAmostras(Posto* posto)
 {
-    Amostra* a = retiraFila(posto->nProcessadas);
-    imprimeAmostra(a);
     int i = 0;
-    while (filaVazia(posto->nProcessadas))
+    while (!filaVazia(posto->nProcessadas))
     {
+        Amostra* a = retiraFila(posto->nProcessadas);
+        // imprimeAmostra(a);
         if (retornaCargaViral(a) >= LIMITE_CARGA_VIRAL)
         {
             registraResultado(a, POSITIVO);
@@ -111,11 +111,6 @@ void processaLoteAmostras(Posto* posto)
             registraResultado(a, NEGATIVO);
             insereFilaFinal(posto->negativos, a);
         }
-        Amostra* a = retiraFila(posto->nProcessadas);
-        // imprimeAmostra(a);
-        i++;
-        if (i == 5)
-            break;
     }
 }
 

@@ -10,10 +10,10 @@ typedef struct Celula Celula;
 
 struct Celula
 {
-    void* item;
+    void *item;
     int tipo;
-    Celula* prox;
-    Celula* ant;
+    Celula *prox;
+    Celula *ant;
 };
 
 struct Lista
@@ -21,9 +21,9 @@ struct Lista
     Celula *primeiro, *ultimo;
 };
 
-Lista* inicializaLista()
+Lista *inicializaLista()
 {
-    Lista* lista = (Lista*)malloc(sizeof(Lista));
+    Lista *lista = (Lista *)malloc(sizeof(Lista));
 
     lista->primeiro = NULL;
     lista->ultimo = NULL;
@@ -31,48 +31,75 @@ Lista* inicializaLista()
     return lista;
 }
 
-//Insere no final
-void insereListaCachorro(Lista* lista, void* item)
+// //Insere no final
+// void insereListaCachorro(Lista* lista, void* item)
+// {
+//     Celula* nova = (Celula*)malloc(sizeof(Celula));
+
+//     if (lista->ultimo == NULL)
+//     {
+//         lista->primeiro = lista->ultimo = nova;
+//     }
+//     else
+//     {
+//         lista->ultimo->prox = nova;
+//         lista->ultimo = lista->ultimo->prox;
+//     }
+//     // lista->ultimo->ant = lista->ultimo;
+//     lista->ultimo->item = item;
+//     lista->ultimo->tipo = CACHORRO;
+//     lista->ultimo->prox = NULL;
+// }
+
+// //Insere no final
+// void insereListaGato(Lista* lista, void* item)
+// {
+//     Celula* nova = (Celula*)malloc(sizeof(Celula));
+
+//     if (lista->ultimo == NULL)
+//     {
+//         lista->primeiro = lista->ultimo = nova;
+//     }
+//     else
+//     {
+//         lista->ultimo->prox = nova;
+//         lista->ultimo = lista->ultimo->prox;
+//     }
+//     lista->ultimo->item = item;
+//     lista->ultimo->tipo = GATO;
+//     lista->ultimo->prox = NULL;
+// }
+
+void insereLista(Lista *lista, void *item, Tipo tipo)
 {
-    Celula* nova = (Celula*)malloc(sizeof(Celula));
-    
-    if (lista->ultimo == NULL)
+    Celula *nova = (Celula *)malloc(sizeof(Celula));
+    if (nova == NULL)
     {
-        lista->primeiro = lista->ultimo = nova;
+        printf("Erro de alocação de memória!\n");
+        exit(1);
+    }
+
+    nova->item = item;
+    nova->tipo = tipo;
+    nova->prox = NULL;
+
+    if (lista->ultimo == NULL)
+    { // Lista vazia
+        nova->ant = NULL;
+        lista->primeiro = nova;
+        lista->ultimo = nova;
     }
     else
-    {
-        lista->ultimo->prox = nova;
-        lista->ultimo = lista->ultimo->prox;
+    {                               // Lista não vazia
+        nova->ant = lista->ultimo;  // Configura o anterior do novo nó
+        lista->ultimo->prox = nova; // Atualiza o próximo do antigo último
+        lista->ultimo = nova;       // Atualiza o ponteiro de último
     }
-    // lista->ultimo->ant = lista->ultimo;
-    lista->ultimo->item = item;
-    lista->ultimo->tipo = CACHORRO;
-    lista->ultimo->prox = NULL;
 }
 
-//Insere no final
-void insereListaGato(Lista* lista, void* item)
+Celula *buscaLista(Lista *lista, char *nome)
 {
-    Celula* nova = (Celula*)malloc(sizeof(Celula));
-    
-    if (lista->ultimo == NULL)
-    {
-        lista->primeiro = lista->ultimo = nova;
-    }
-    else
-    {
-        lista->ultimo->prox = nova;
-        lista->ultimo = lista->ultimo->prox;
-    }
-    lista->ultimo->item = item;
-    lista->ultimo->tipo = GATO;
-    lista->ultimo->prox = NULL;
-}
-
-Celula* buscaLista(Lista* lista, char* nome)
-{
-    Celula* p = lista->primeiro;
+    Celula *p = lista->primeiro;
     while (p)
     {
         switch (p->tipo)
@@ -97,32 +124,103 @@ Celula* buscaLista(Lista* lista, char* nome)
     return NULL;
 }
 
-void retiraLista(Lista* lista, char* nome)
+void retiraLista(Lista *lista, char *nome)
 {
-    Celula* celula = buscaLista(lista, nome);
+    Celula *celula = buscaLista(lista, nome);
 
     if (!celula)
         return;
 
-    //Caso especial: p é o primeiro item
-    if (celula == lista)
+    // Caso especial: item unico
+    if (celula == lista->primeiro && celula == lista->ultimo)
     {
-        lista = celula->prox;
+        lista->primeiro = lista->ultimo = NULL;
     }
+
+    // Vendo se é o primeiro
+    else if (celula == lista->primeiro)
+    {
+        lista->primeiro = celula->prox;
+        lista->primeiro->ant = NULL;
+    }
+
+    // Vendo se é o último
+    else if (celula == lista->ultimo)
+    {
+        lista->ultimo = celula->ant;
+        lista->ultimo->prox = NULL;
+    }
+
     else
     {
-        //O proximo do anterior vai receber o próximo do produto
         celula->ant->prox = celula->prox;
-    }
-    
-    //Caso especial: vendo se p é o ultimo item
-    if (celula->prox)
-    {
-        //O Anterior do próximo item vai receber o produto anterior
         celula->prox->ant = celula->ant;
     }
-    
-    desalocaProduto(celula->item);
+
+    // switch (celula->tipo)
+    // {
+    // case CACHORRO:
+    //     desalocaCachorro(celula->item);
+    //     break;
+    // case GATO:
+    //     desalocaGato(celula->item);
+    // default:
+    //     break;
+    // }
     free(celula);
-    return lista;
+}
+
+void imprimeLista(Lista *lista)
+{
+    Celula *aux = lista->primeiro;
+    while (aux)
+    {
+        switch (aux->tipo)
+        {
+        case CACHORRO:
+            imprimeCachorro(aux->item);
+            break;
+        case GATO:
+            imprimeGato(aux->item);
+            break;
+        default:
+            break;
+        }
+        aux = aux->prox;
+    }
+    printf("\n");
+}
+
+void liberaLista(Lista *lista)
+{
+    if (lista)
+    {
+        Celula *aux;
+        Celula *prox;
+        aux = lista->primeiro;
+        while (aux)
+        {
+            prox = aux->prox;
+            free(aux);
+            aux = prox;
+        }
+        lista->primeiro = NULL;
+        lista->ultimo = NULL;
+        free(lista);
+    }
+    lista = NULL;
+}
+
+// Nova função de iteração
+void paraCadaItem(Lista *lista, IteradorLista iterador, void *dadoExtra)
+{
+    if (lista == NULL || iterador == NULL)
+        return;
+
+    Celula *atual = lista->primeiro;
+    while (atual != NULL)
+    {
+        iterador(atual->item, atual->tipo, dadoExtra);
+        atual = atual->prox;
+    }
 }
