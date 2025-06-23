@@ -26,7 +26,7 @@ typedef struct Celula Celula;
 
 struct Celula
 {
-    TPedido* item;
+    TProduto* item;
     Celula* proximo;
 };
 
@@ -64,7 +64,35 @@ TPedido* InicPedido (char* dono)
  *----------------------------------------------------------------------*/
 void IncluiProdutoPedido (TPedido* pedido, TProduto* prod)
 {
+    Celula* aux = pedido->primeiro;
     
+    while (aux)
+    {
+        if (!strcmp(RetornaNome(aux->item), RetornaNome(prod)))
+        {
+            printf("Produto já existe no pedido\n");
+            return;
+        }
+        aux = aux->proximo;
+    }
+    
+    Celula* nova = malloc(sizeof(Celula));
+    nova->item = prod;
+    nova->proximo = NULL;
+    if (!pedido->primeiro && !pedido->ultimo)
+    {
+        pedido->primeiro = pedido->ultimo = nova;
+    }
+    else if (pedido->primeiro == pedido->ultimo)
+    {
+        pedido->primeiro->proximo = nova;
+        pedido->ultimo = nova;
+    }
+    else
+    {
+        pedido->ultimo->proximo = nova;
+        pedido->ultimo = nova;
+    }
 }
 
 /*----------------------------------------------------------------------
@@ -75,7 +103,23 @@ void IncluiProdutoPedido (TPedido* pedido, TProduto* prod)
  * pre-condicao: pedido devidamente inicializado
  * pos-condicao: funcao nao alterad os dados do pedido
  *----------------------------------------------------------------------*/
-void ImprimePedido (TPedido* pedido);
+void ImprimePedido (TPedido* pedido)
+{
+    printf("\nDono: %s", pedido->dono);
+    Celula* aux = pedido->primeiro;
+    if (aux)
+    {
+        while (aux)
+        {
+            ImprimeIngredientes(aux->item);
+            aux = aux->proximo;
+        }
+    }
+    else 
+    {
+        printf("Não há produtos nesse pedido\n");
+    }
+}
 
 /*----------------------------------------------------------------------
  * Retira a unica ocorrência do produto (caso ele exista na lista).
@@ -85,7 +129,41 @@ void ImprimePedido (TPedido* pedido);
  * pre-condicao: pedido e produto devidamente inicializados
  * pos-condicao: pedido nao contem o produto
  *----------------------------------------------------------------------*/
-void RetiraProdutoPedido (TPedido* pedido, char* prod);
+void RetiraProdutoPedido (TPedido* pedido, char* prod)
+{
+    Celula* ant = NULL;
+    Celula* p = pedido->primeiro;
+    while (p && strcmp(RetornaNome(p->item), prod))
+    {
+        ant = p;
+        p = p->proximo;
+    }
+
+    if (!p)
+    {
+        return;
+    }
+
+    if (p == pedido->primeiro && p == pedido->ultimo)
+    {
+        pedido->primeiro = pedido->ultimo = NULL;
+    }
+    else if (p == pedido->ultimo)
+    {
+        pedido->ultimo = ant;
+        ant->proximo = NULL;
+    }
+    else if (p == pedido->primeiro)
+    {
+        pedido->primeiro = p->proximo;
+    }
+    else
+    {
+        ant->proximo = p->proximo;
+    }
+    free(p);
+
+}
 
 //A função envia pedido verifica se há restrição calórica ou restrição alimentar
 //Se estiver tudo ok, retira o pedido da lista (libera o pedido, porém não libera o produto) e retorna 1
@@ -101,4 +179,56 @@ void RetiraProdutoPedido (TPedido* pedido, char* prod);
  * pre-condicao: pedido devidamente inicializado e strings validas
  * pos-condicao: se houver problema com as restricoes, o pedido deve ficar inalterado. se estiver tudo ok com as restricoes, deve destruir o pedido, porem os produtos nao devem ser liberados (pois podem estar em outros pedidos, de outras pessoas).
  *----------------------------------------------------------------------*/
-int EnviaPedido (TPedido* pedido, int restricao_calorica, char* restricao_alimentar);
+int EnviaPedido (TPedido* pedido, int restricao_calorica, char* restricao_alimentar)
+{
+    int caloriasTotais = 0;
+    
+    Celula* aux = pedido->primeiro;
+    while (aux)
+    {
+        caloriasTotais += Calorias(aux->item);
+        aux = aux->proximo;
+    }
+    if (caloriasTotais > restricao_calorica)
+    {
+        printf("Pedido não Enviado! Pedido tem mais calorias do que a restricao, tente retirar algum produto!\n");
+        return 0;
+    }
+
+    if (*restricao_alimentar)
+    {
+        aux = pedido->primeiro;
+        while (aux)
+        {
+            if (VerificaIngrediente(aux->item, restricao_alimentar))
+            {
+                printf("Pedido não Enviado! Restricao alimentar no produto: %s\n", RetornaNome(aux->item));
+                return 0;
+            }
+            aux = aux->proximo;
+        }
+    }
+
+    if (pedido)
+    {
+        aux = pedido->primeiro;
+        Celula* prox;
+
+        while (aux)
+        {
+            prox = aux->proximo;
+            free(aux);
+            aux = prox;
+        }
+        pedido->primeiro = NULL;
+        pedido->ultimo = NULL;
+        if (pedido->dono)
+        {
+            free(pedido->dono);
+        }
+        free(pedido);
+        pedido = NULL;
+        return 1;
+    }
+    return -1;
+}
