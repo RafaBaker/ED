@@ -110,7 +110,6 @@ TAluno* Retira (TLista* lista, int mat)
 
     if (!aux)
     {
-        printf("Aluno não encontrado no retira\n");
         return NULL;
     }
 
@@ -212,7 +211,11 @@ void LiberaAluno (TAluno* aluno)
 {
     if (aluno)
     {
-        free(aluno->nome);
+        if (aluno->nome)
+        {
+            free(aluno->nome);
+        }
+        aluno->nome = NULL;
 
         free(aluno);
     }
@@ -253,7 +256,7 @@ void LiberaLista (TLista* lista)
         while (aux)
         {
             Celula* prox = aux->proximo;
-            LiberaAluno(aux->aluno);
+            // if (aux->aluno) LiberaAluno(aux->aluno);
             free(aux);
             aux = prox;
         }
