@@ -15,7 +15,14 @@ struct aluno
 {
     char* nome;
     int matricula;
-    TAluno* proximo;
+};
+
+typedef struct Celula Celula;
+
+struct Celula
+{
+    TAluno* aluno;
+    Celula* proximo;
 };
 
 /*Tipo que define a lista (tipo opaco)
@@ -23,7 +30,7 @@ struct aluno
  Usar lista COM Sentinela */
 struct lista
 {
-    TAluno* primeiro, *ultimo;
+    Celula* primeiro, *ultimo;
 };
 
 /*Inicializa o sentinela de uma lista
@@ -52,7 +59,6 @@ TAluno* InicializaAluno(char* nome, int matricula)
 
     aluno->nome = strdup(nome);
     aluno->matricula = matricula;
-    aluno->proximo = NULL;
 
     return aluno;
 }
@@ -64,6 +70,9 @@ TAluno* InicializaAluno(char* nome, int matricula)
  * pos-condicao: lista contem o aluno inserido na primeira posicao */
 void InsereAluno (TLista* lista, TAluno* aluno)
 {
+    Celula* nova = malloc(sizeof(Celula));
+    nova->aluno = aluno;
+
     if (lista == NULL && aluno == NULL)
     {
         printf("Lista ou aluno NULL\n");
@@ -72,13 +81,14 @@ void InsereAluno (TLista* lista, TAluno* aluno)
 
     if (lista->primeiro == NULL && lista->ultimo == NULL)
     {
-        lista->primeiro = lista->ultimo = aluno;
+        lista->primeiro = lista->ultimo = nova;
+        nova->proximo = NULL;
     }
 
     else
     {
-        aluno->proximo = lista->primeiro;
-        lista->primeiro = aluno;
+        nova->proximo = lista->primeiro;
+        lista->primeiro = nova;
     }
 }
 
@@ -89,10 +99,10 @@ void InsereAluno (TLista* lista, TAluno* aluno)
  * pos-condicao: lista nao contem a primeira ocorrencia do aluno de matricula mat */
 TAluno* Retira (TLista* lista, int mat)
 {
-    TAluno* aux = lista->primeiro;
-    TAluno* ant = aux;
+    Celula* aux = lista->primeiro;
+    Celula* ant = aux;
 
-    while (aux && aux->matricula != mat)
+    while (aux && aux->aluno->matricula != mat)
     {
         ant = aux;
         aux = aux->proximo;
@@ -123,7 +133,7 @@ TAluno* Retira (TLista* lista, int mat)
     }
 
 
-    return aux;
+    return aux->aluno;
 
 }
 
@@ -134,16 +144,16 @@ TAluno* Retira (TLista* lista, int mat)
  * pos-condicao: lista nao contem repeticoes de alunos - APENAS UMA OCORRENCIA DE CADA ALUNO */
 void RetiraRepetidos (TLista* lista)
 {
-    TAluno* aluno = lista->primeiro;
-    TAluno* aux;
+    Celula* aluno = lista->primeiro;
+    Celula* aux;
     while (aluno)
     {
         aux = aluno->proximo;
         while (aux)
         {
-            if (aux->matricula == aluno->matricula)
+            if (aux->aluno->matricula == aluno->aluno->matricula)
             {
-                Retira(lista, aluno->matricula);
+                Retira(lista, aluno->aluno->matricula);
             }
 
             aux = aux->proximo;
@@ -164,8 +174,8 @@ void RetiraRepetidos (TLista* lista)
 TLista* Merge (TLista* turma1, TLista* turma2)
 {
     TLista* nova = CriaLista();
-    TAluno* aux1 = turma1->primeiro;
-    TAluno* aux2 = turma2->primeiro;
+    Celula* aux1 = turma1->primeiro;
+    Celula* aux2 = turma2->primeiro;
     int vez = 1; // 1 para turma1, 0 para turma2
 
     while (aux1 || aux2)
@@ -174,7 +184,7 @@ TLista* Merge (TLista* turma1, TLista* turma2)
         {
             if (aux1)
             {
-                InsereAluno(nova, aux1);
+                InsereAluno(nova, aux1->aluno);
                 aux1 = aux1->proximo;
             }
             vez = 0;
@@ -183,7 +193,7 @@ TLista* Merge (TLista* turma1, TLista* turma2)
         {
             if (aux2)
             {
-                InsereAluno(nova, aux2);
+                InsereAluno(nova, aux2->aluno);
                 aux2 = aux2->proximo;
             }
             vez = 1;
@@ -219,10 +229,11 @@ void Imprime (TLista* lista)
     if (!lista) return;
 
 
-    TAluno* aux = lista->primeiro;
+    Celula* aux = lista->primeiro;
     while (aux)
     {
-        printf("Aluno: %s Matricula: %d\n", aux->nome, aux->matricula);
+        TAluno* aluno = aux->aluno;
+        printf("Aluno: %s Matricula: %d\n", aluno->nome, aluno->matricula);
         aux = aux->proximo;
     }
 
@@ -237,12 +248,13 @@ void LiberaLista (TLista* lista)
 {
     if (lista)
     {
-        TAluno* aux = lista->primeiro;
+        Celula* aux = lista->primeiro;
 
         while (aux)
         {
-            TAluno* prox = aux->proximo;
-            LiberaAluno(aux);
+            Celula* prox = aux->proximo;
+            LiberaAluno(aux->aluno);
+            free(aux);
             aux = prox;
         }
 
