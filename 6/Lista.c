@@ -224,3 +224,5 @@ void paraCadaItem(Lista *lista, IteradorLista iterador, void *dadoExtra)
         atual = atual->prox;
     }
 }
+
+//
