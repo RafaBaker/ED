@@ -56,7 +56,7 @@ int arv_pertence (Arv* a, int mat)
     if (arv_vazia(a))
         return 0;
 
-    return retornaMat(a) == mat || arv_pertence(a->esq, mat) || arv_pertence(a->dir, mat);
+    return (retornaMat(a->info) == mat) || arv_pertence(a->esq, mat) || arv_pertence(a->dir, mat);
 }
 
 //imprime as informações dos nós da árvore
@@ -65,27 +65,41 @@ void arv_imprime (Arv* a)
     if (!arv_vazia(a))
     {
         imprimeAluno(a->info);
+        printf("\n");
         arv_imprime(a->esq);
         arv_imprime(a->dir);
+    }
+}
+
+void arv_imprimeRaiz (Arv* a)
+{
+    if (!arv_vazia(a))
+    {
+        imprimeAluno(a->info);
+        printf("\n");
+    }
+    else
+    {
+        printf("ninguem\n");
     }
 }
 
 //retorna a mãe/pai de um dado no que contém o aluno com a matrícula mat
 Arv* arv_pai (Arv* a, int mat)
 {
-    if (!arv_vazia(a) || retornaMat(a) == mat)
+    if (arv_vazia(a) || retornaMat(a->info) == mat)
         return NULL;
     
-    if (retornaMat(a->dir) == mat || retornaMat(a->esq) == mat)
+    if ((a->dir && retornaMat(a->dir->info) == mat) || (a->esq && retornaMat(a->esq->info) == mat))
         return a;
 
-    Arv* a = arv_pai(a->dir, mat);
-    if (a)
-        return a;
+    Arv* b = arv_pai(a->dir, mat);
+    if (b)
+        return b;
 
-    a = arv_pai(a->esq, mat);
-    if (a)
-        return a;
+    b = arv_pai(a->esq, mat);
+    if (b)
+        return b;
 
     return NULL;
 }
@@ -110,12 +124,19 @@ int folhas (Arv* a)
 //retorna o numero de ocorrencias de um dado aluno na árvore
 int ocorrencias (Arv* a, int mat)
 {
+    int cont = 0;
     if (arv_vazia(a))
         return 0;
-    if (retornaMat(a) == mat)
-        return 1;
+    if (retornaMat(a->info) == mat)
+        cont++;
+    
+    cont += ocorrencias(a->dir, mat) + ocorrencias(a->esq, mat);    
+    return cont;
+}
 
-    return ocorrencias(a->dir, mat) + ocorrencias(a->esq, mat);
+static int max2(int a, int b)
+{
+    return (a>b) ? a : b;
 }
 
 //retorna a altura da árvore a
@@ -124,9 +145,4 @@ int altura(Arv* a)
     if (arv_vazia(a))
         return -1;
     return 1+max2(altura(a->esq), altura(a->dir));
-}
-
-static int max2(int a, int b)
-{
-    return (a>b) ? a : b;
 }

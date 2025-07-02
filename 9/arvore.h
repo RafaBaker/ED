@@ -28,6 +28,9 @@ int arv_pertence (Arv* a, int mat);
 //imprime as informações dos nós da árvore
 void arv_imprime (Arv* a);
 
+void arv_imprimeRaiz (Arv* a);
+
+
 //retorna a mãe/pai de um dado no que contém o aluno com a matrícula mat
 Arv* arv_pai (Arv* a, int mat);
 

@@ -28,7 +28,7 @@ int retornaMat(Aluno* aluno)
 
 void imprimeAluno(Aluno* aluno)
 {
-    printf("Aluno %s\n", aluno->nome);
+    printf("Aluno %s", aluno->nome);
 }
 
 void liberaAluno(Aluno* aluno)
