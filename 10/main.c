@@ -6,7 +6,7 @@
 
 #include "utils.h"
 
-#define QUANTIDADE 100000
+#define QUANTIDADE 1000000
 
 int main(int argc, char const *argv[])
 {
@@ -19,18 +19,23 @@ int main(int argc, char const *argv[])
 
     for (int i = 0; i < QUANTIDADE; i++)
     {
-        vetor[i] = rand() % 1000 + 1;
+        vetor[i] = rand() % 100000 + 1;
         // printf("vetor[%d]: %d\n", i, vetor[i]);
     }
 
-    bubbleSort(vetor, QUANTIDADE);
+    // buscaLinear(QUANTIDADE, vetor, 5);
+
+    // quickSort(QUANTIDADE, vetor);
+
+    buscaLinear(QUANTIDADE, vetor, 500);
+    buscaBinaria(QUANTIDADE, vetor, 500);
 
     free(vetor);
 
     end = clock();
 
     tempo = (double)(end-start) / CLOCKS_PER_SEC;
-    printf("Tempo de execução: %.2f segundos\n", tempo);
+    printf("Tempo de execução: %.9f segundos\n", tempo);
 
     return 0;
 }
