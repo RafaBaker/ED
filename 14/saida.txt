@@ -1,0 +1,13 @@
+a 1
+arquivo 1
+entrada 1
+estruturas 1
+exemplo 1
+para 1
+prova 1
+dados 2
+de 5
+------------------------
+9 palavras distintas encontradas
+14 palavras no total
+de é a palavra de maior frequencia (5)
