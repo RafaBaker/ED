@@ -60,7 +60,8 @@
     "comidanaovegana.h": "c",
     "stdlib.h": "c",
     "random": "c",
-    "stdio.h": "c"
+    "stdio.h": "c",
+    "string.h": "c"
   },
   "editor.fontFamily": "Fira Code"
 }
